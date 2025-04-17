@@ -1,5 +1,6 @@
 from lxml import etree
 import sys
+import re
 
 def aiken_to_moodle(aiken_file_path, moodle_file_path, tag=""):
     with open(aiken_file_path, 'r') as file:
@@ -13,7 +14,10 @@ def aiken_to_moodle(aiken_file_path, moodle_file_path, tag=""):
         prefix = ""
         if tag != "":
             prefix = "[#"+ tag +"] " 
-        question_text_real = prefix + lines[0].split('. ', 1)[1]
+        if bool(re.match(r'^\d+\. ', lines[0])):
+            question_text_real = prefix + lines[0].split('. ', 1)[1]
+        else:
+            question_text_real = prefix + lines[0]
         answers = lines[1:5]
         
         correct_answer = lines[5].split(': ')[1]
@@ -58,8 +62,10 @@ def aiken_to_moodle(aiken_file_path, moodle_file_path, tag=""):
 
 aiken_file_path = sys.argv[1] 
 moodle_file_path = sys.argv[2]
+# Default situation when no tag
 tag=""
 if len(sys.argv)>=4:  
+    # EXAM only works properly on bulk import with lower case tags for some reason
     tag = str(sys.argv[3]).lower()
 
 
