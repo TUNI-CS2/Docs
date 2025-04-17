@@ -60,7 +60,7 @@ aiken_file_path = sys.argv[1]
 moodle_file_path = sys.argv[2]
 tag=""
 if len(sys.argv)>=4:  
-    tag = sys.argv[3]
+    tag = str(sys.argv[3]).lower()
 
 
 aiken_to_moodle(aiken_file_path, moodle_file_path,tag)
