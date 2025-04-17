@@ -1,7 +1,7 @@
 from lxml import etree
 import sys
 
-def aiken_to_moodle(aiken_file_path, moodle_file_path, tagg):
+def aiken_to_moodle(aiken_file_path, moodle_file_path, tag=""):
     with open(aiken_file_path, 'r') as file:
         aiken_questions = file.read()
 
@@ -10,7 +10,10 @@ def aiken_to_moodle(aiken_file_path, moodle_file_path, tagg):
     
     for question in questions:
         lines = question.split('\n')
-        question_text_real = "[#"+ tagg +"] " +lines[0].split('. ', 1)[1]
+        prefix = ""
+        if tag != "":
+            prefix = "[#"+ tag +"] " 
+        question_text_real = prefix + lines[0].split('. ', 1)[1]
         answers = lines[1:5]
         
         correct_answer = lines[5].split(': ')[1]
@@ -26,10 +29,10 @@ def aiken_to_moodle(aiken_file_path, moodle_file_path, tagg):
 
         default_grade=etree.SubElement(question_element,"defaultgrade")
         default_grade.text = "0.33333"
-
-        tags = etree.SubElement(question_element,'tags')
-        tag = etree.SubElement(tags,"tag")
-        etree.SubElement(tag,"text").text = "#"+tagg
+        if tag !="":
+            tags = etree.SubElement(question_element,'tags')
+            tag_element = etree.SubElement(tags,"tag")
+            etree.SubElement(tag_element,"text").text = "#"+tag
         
         shuffle = etree.SubElement(question_element,"shuffleanswers")
         shuffle.text = '1'
@@ -54,7 +57,10 @@ def aiken_to_moodle(aiken_file_path, moodle_file_path, tagg):
     document.write(moodle_file_path, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
 aiken_file_path = sys.argv[1] 
-moodle_file_path = sys.argv[2]  
-tag = sys.argv[3]
+moodle_file_path = sys.argv[2]
+tag=""
+if len(sys.argv)>=4:  
+    tag = sys.argv[3]
+
 
 aiken_to_moodle(aiken_file_path, moodle_file_path,tag)
